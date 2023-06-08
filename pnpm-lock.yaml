@@ -39,9 +39,6 @@ importers:
 
   examples/astro-edge:
     dependencies:
-      '@statsy/astro':
-        specifier: workspace:*
-        version: link:../../packages/astro
       astro:
         specifier: ^2.5.6
         version: 2.5.6(@types/node@18.16.8)
