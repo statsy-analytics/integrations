@@ -1,0 +1,41 @@
+{
+  "name": "gatsby-plugin-statsy",
+  "version": "0.0.7",
+  "description": "",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**",
+    "README.md",
+    "LICENSE"
+  ],
+  "author": "Thom Krupa <thom@statsy.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@statsy/react": "workspace:*",
+    "@swc/core": "^1.3.60",
+    "@types/node": "^20.2.5",
+    "@types/react": "^18.2.7",
+    "gatsby": "^5.10.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "terser": "^5.17.7",
+    "tsup": "^6.7.0",
+    "typescript": "^5.0.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup && cp dist/gatsby-ssr.js gatsby-ssr.js && cp dist/gatsby-node.js gatsby-node.js",
+    "dev": "tsup --watch",
+    "lint": "eslint .",
+    "lint-fix": "eslint . --fix",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "minimatch": "^9.0.1"
+  }
+}

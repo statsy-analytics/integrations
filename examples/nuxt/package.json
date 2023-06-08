@@ -1,0 +1,24 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@types/node": "^18",
+    "nuxt": "^3.5.2"
+  },
+  "dependencies": {
+    "@statsy/nuxt": "workspace:*",
+    "@statsy/vue": "workspace:*",
+    "@vue/reactivity": "^3.3.4",
+    "@vue/runtime-core": "^3.3.4",
+    "@vue/runtime-dom": "^3.3.4",
+    "@vue/shared": "^3.3.4",
+    "vue": "^3.3.4"
+  }
+}

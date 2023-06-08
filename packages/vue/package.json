@@ -1,0 +1,35 @@
+{
+  "name": "@statsy/vue",
+  "version": "0.0.7",
+  "description": "",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint .",
+    "lint-fix": "eslint . --fix",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "type-check": "tsc --noEmit"
+  },
+  "author": "Thom Krupa <thom@statsy.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@statsy/analytics": "workspace:*",
+    "@swc/core": "^1.3.60",
+    "@types/node": "^20.2.5",
+    "@vue/runtime-core": "^3.3.4",
+    "tsup": "^6.7.0",
+    "typescript": "^5.0.4",
+    "vue": "^3.3.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
