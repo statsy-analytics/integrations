@@ -1,3 +1,5 @@
+import { next } from "@vercel/edge";
+
 export async function middleware(request: Request) {
   console.log({ url: request.url });
 
@@ -17,5 +19,7 @@ export async function middleware(request: Request) {
     }),
   });
 
-  return new Response(request.url);
+  return next({
+    headers: { "x-from-middleware": "true" },
+  });
 }
