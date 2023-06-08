@@ -19,11 +19,11 @@ const statsy = await fetch(`https://api.statsy.com/v1/beep`, {
 		eventName: "pageview",
 		url: request.url,
 		domain: "astro-edge-tracking.vercel.app",
-		referrer: request.headers.get("referer"),
+		referrer: request.headers.get("referer") || "",
 	}),
 });
 
-console.log({ status: statsy.status})
+console.log({ status: statsy.status, url: request.url, referrer: request.headers.get("referer"), ip: request.headers.get("x-forwarded-for") || "", userAgent: request.headers.get("user-agent") || ""})
 
 
 ---
