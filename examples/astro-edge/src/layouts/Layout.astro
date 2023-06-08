@@ -17,13 +17,13 @@ const statsy = await fetch(`https://api.statsy.com/v1/beep`, {
 	},
 	body: JSON.stringify({
 		eventName: "pageview",
-		url: request.url,
+		href: request.url,
 		domain: "astro-edge-tracking.vercel.app",
 		referrer: request.headers.get("referer") || "",
 	}),
 });
 
-console.log({ status: statsy.status, url: request.url, referrer: request.headers.get("referer"), ip: request.headers.get("x-forwarded-for") || "", userAgent: request.headers.get("user-agent") || ""})
+console.log({ status: statsy.status })
 
 
 ---
