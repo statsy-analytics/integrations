@@ -10,7 +10,7 @@ export async function middleware(request: Request) {
       Authorization: `Bearer ${process.env.STATSY_API_KEY}`,
     },
     body: JSON.stringify({
-      name: "pageview",
+      eventName: "pageview",
       url: request.url,
       domain: "statsy-astro-edge.vercel.app",
       referrer: request.headers.get("referer"),
