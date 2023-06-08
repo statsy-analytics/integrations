@@ -7,7 +7,7 @@ const { title } = Astro.props;
 
 const request = Astro.request
 
-await fetch(`https://api.statsy.com/v1/beep`, {
+const statsy = await fetch(`https://api.statsy.com/v1/beep`, {
 	method: "POST",
 	headers: {
 		"Content-Type": "application/json",
@@ -22,6 +22,9 @@ await fetch(`https://api.statsy.com/v1/beep`, {
 		referrer: request.headers.get("referer"),
 	}),
 });
+
+console.log({ status: statsy.status})
+
 
 ---
 
