@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build && cp middleware.js .vercel/output",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
