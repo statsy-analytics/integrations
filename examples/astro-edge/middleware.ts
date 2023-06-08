@@ -1,7 +1,6 @@
-import { defineMiddleware } from "astro/middleware";
-
-export const onRequest = defineMiddleware(async ({ request }, next) => {
+export async function middleware(request: Request) {
   console.log({ url: request.url });
+
   await fetch(`https://api.statsy.com/v1/beep`, {
     method: "POST",
     headers: {
@@ -18,6 +17,5 @@ export const onRequest = defineMiddleware(async ({ request }, next) => {
     }),
   });
 
-  // return a Response or the result of calling `next()`
-  return next();
-});
+  return new Response(request.url);
+}
