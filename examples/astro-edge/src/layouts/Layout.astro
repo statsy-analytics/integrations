@@ -23,7 +23,7 @@ const statsy = await fetch(`https://api.statsy.com/v1/beep`, {
 	}),
 });
 
-console.log({ status: statsy.status })
+console.log({ status: statsy.status, url: request.url, referrer: request.headers.get("referer"), ip: request.headers.get("x-forwarded-for") || "", userAgent: request.headers.get("user-agent") || ""})
 
 
 ---
