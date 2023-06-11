@@ -223,13 +223,13 @@ function inject({
  *
  * @param {Request} [request] - The request object containing the url and headers. This parameter is optional and only used in a server context.
  */
-function trackPageview(request?: Request) {
+async function trackPageview(request?: Request) {
   if (isBrowser()) {
     if (window.statsy != null) {
       window.statsy.call(window, "pageview");
     }
   } else {
-    trackServerPageview(request);
+    return trackServerPageview(request);
   }
 }
 
@@ -241,13 +241,13 @@ function trackPageview(request?: Request) {
  * @param {Record<string, AllowedPropertyValues>} [params.props] - Additional properties to send with the event. This parameter is optional.
  * @param {Request} [params.request] - The request object containing the url and headers. This parameter is optional and only used in a server context.
  */
-function trackEvent({ name, props, request }: TrackEventOptions) {
+async function trackEvent({ name, props, request }: TrackEventOptions) {
   if (isBrowser()) {
     if (window.statsy != null) {
       window.statsy.call(window, name, props);
     }
   } else {
-    trackServerEvent({ request, name, props });
+    return trackServerEvent({ request, name, props });
   }
 }
 
