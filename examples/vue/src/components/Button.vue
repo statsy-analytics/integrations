@@ -7,7 +7,7 @@ export default {
   name: 'Button',
   methods: {
     trackEvent() {
-      this.$statsy.track('button-click', { label: 'Contact Form' })
+      this.$statsy.trackEvent({ name: 'button-click', props: { label: 'Contact Form' } })
     }
   }
 }
