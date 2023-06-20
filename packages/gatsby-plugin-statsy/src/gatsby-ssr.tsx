@@ -1,6 +1,5 @@
 import React from "react";
 import type { GatsbySSR } from "gatsby";
-import { Script } from "gatsby";
 import { Minimatch } from "minimatch";
 import type { MMRegExp } from "minimatch";
 
@@ -86,7 +85,7 @@ const onRenderBody: GatsbySSR["onRenderBody"] = async (
   setHeadComponents([
     <link rel="preconnect" key="preconnect-statsy" href={origin} />,
     <link rel="dns-prefetch" key="dns-prefetch-statsy" href={origin} />,
-    <Script
+    <script
       key="script-statsy"
       src={`${origin}/${pluginOptions.siteId}.js`}
       defer={true}
@@ -95,7 +94,7 @@ const onRenderBody: GatsbySSR["onRenderBody"] = async (
 
   if (pluginOptions.exclude || pluginOptions.removeQueryParams) {
     setHeadComponents([
-      <Script
+      <script
         key="gatsby-plugin-statsy-middleware"
         dangerouslySetInnerHTML={{
           __html: `${eventMiddleware}`,
