@@ -2,7 +2,7 @@
 import { trackPageview } from "@statsy/analytics"
 
 // Send a pageview to Statsy
-await trackPageview(Astro.request)
+await trackPageview({ request: Astro.request })
 
 export interface Props {
 	title: string;
