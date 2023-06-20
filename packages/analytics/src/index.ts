@@ -4,7 +4,7 @@ interface PageViewEvent {
 }
 
 interface CustomEvent {
-  name: string;
+  name: string; // consider limiting the names
   href: string;
 }
 
@@ -23,7 +23,9 @@ export declare type StatsyEvent =
   | CustomEvent
   | WebVitalEvent
   | RequestEvent;
+
 declare type AllowedPropertyValues = string | number | boolean | null;
+
 declare type EventMiddleware = (event: StatsyEvent) => StatsyEvent | null;
 
 export interface AnalyticsProps {
@@ -45,6 +47,103 @@ declare global {
   }
 }
 
+interface UrlWithHeaders {
+  url: string;
+  headers: Headers;
+}
+
+export interface TrackEventOptions {
+  request?: UrlWithHeaders;
+  name: string;
+  props?: Record<string, AllowedPropertyValues>;
+}
+
+interface FetchEventOptions {
+  request: UrlWithHeaders;
+  eventName: string;
+  name?: string;
+  props?: Record<string, AllowedPropertyValues>;
+}
+/**
+ * A helper function to send a request to Statsy API.
+ *
+ * @async
+ * @function
+ * @param {Object} options - The options for the Statsy API call.
+ * @param {string} options.eventName - The name of the event.
+ * @param {UrlWithHeaders} options.request - The request object containing the url and headers.
+ * @param {Record<string, AllowedPropertyValues>} options.props - Additional properties to send with the event.
+ * @throws {Error} Throws an error if request object or STATS_API_KEY environment variable are not provided.
+ */
+async function sendToStatsyApi({
+  request,
+  eventName,
+  props,
+}: FetchEventOptions) {
+  if (!request) {
+    throw new Error(
+      `You must pass the request object to ${eventName} when using server-side tracking.`
+    );
+  }
+
+  const { hostname } = new URL(request.url);
+  const statsyApiKey = process.env.STATSY_API_KEY;
+
+  if (!statsyApiKey) {
+    throw new Error(
+      "You must set the STATSY_API_KEY environment variable to use the Statsy Edge application."
+    );
+  }
+
+  try {
+    return await fetch(`https://api.statsy.com/v1/beep`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Forwarded-For": request.headers.get("x-forwarded-for") || "",
+        "User-Agent": request.headers.get("user-agent") || "",
+        Authorization: `Bearer ${statsyApiKey}`,
+      },
+      body: JSON.stringify({
+        eventName,
+        href: request.url,
+        domain: hostname,
+        referrer: request.headers.get("referer") || "",
+        name,
+        props,
+      }),
+    });
+  } catch (error) {
+    console.error(`Failed to send ${eventName} event to Statsy API`, error);
+    // Here, consider if you want to re-throw the error, depending on your error handling strategy
+  }
+}
+
+/**
+ * Track a pageview event in server context.
+ *
+ * @async
+ * @function
+ * @param {UrlWithHeaders} request - The request object containing the url and headers.
+ */
+async function trackServerPageview({ request }: { request: UrlWithHeaders }) {
+  await sendToStatsyApi({ request: request!, eventName: "pageview" });
+}
+
+/**
+ * Track a custom event in server context.
+ *
+ * @async
+ * @function
+ * @param {Object} options - The options for the event tracking.
+ * @param {UrlWithHeaders} options.request - The request object containing the url and headers.
+ * @param {string} options.name - The name of the custom event.
+ * @param {Record<string, AllowedPropertyValues>} options.props - Additional properties to send with the event.
+ */
+async function trackServerEvent({ request, name, props }: TrackEventOptions) {
+  await sendToStatsyApi({ request: request!, eventName: name, name, props });
+}
+
 export const initQueue = () => {
   if (window.statsy) return;
   window.statsy = function queue(...params) {
@@ -58,112 +157,6 @@ function isDevelopment() {
 
 function isBrowser() {
   return typeof window !== "undefined";
-}
-
-interface UrlWithHeaders {
-  url: string;
-  headers: Headers;
-}
-
-/**
- * Track a pageview event.
- *
- * @async
- * @function
- * @param {Request} request - The request object containing the url and headers.
- * @returns {Promise<Response>} The response from the Statsy API.
- * @throws {Error} Throws an error if it fails to send the request.
- */
-async function trackServerPageview(request?: UrlWithHeaders) {
-  if (!request) {
-    throw new Error(
-      "You must pass the request object to trackPageview when using server-side tracking."
-    );
-  }
-
-  const { hostname } = new URL(request.url);
-
-  if (!process.env.STATSY_API_KEY) {
-    throw new Error(
-      "You must set the STATSY_API_KEY environment variable to use the Statsy Edge application."
-    );
-  }
-
-  const acceptHeader = request.headers.get("accept");
-  const contentTypeHeader = request.headers.get("content-type");
-
-  if (
-    (acceptHeader && acceptHeader.includes("text/html")) ||
-    (contentTypeHeader && contentTypeHeader.includes("text/html"))
-  ) {
-    return await fetch(`https://api.statsy.com/v1/beep`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Forwarded-For": request.headers.get("x-forwarded-for") || "",
-        "User-Agent": request.headers.get("user-agent") || "",
-        Authorization: `Bearer ${process.env.STATSY_API_KEY}`,
-      },
-      body: JSON.stringify({
-        eventName: "pageview",
-        href: request.url,
-        domain: hostname,
-        referrer: request.headers.get("referer") || "",
-      }),
-    });
-  }
-
-  return Promise.resolve();
-}
-
-interface TrackEventOptions {
-  request?: UrlWithHeaders;
-  name: string;
-  props?: Record<string, AllowedPropertyValues>;
-}
-
-/**
- * Track a custom event.
- *
- * @async
- * @function
- * @param {Request} request - The request object containing the url and headers.
- * @param {string} name - The name of the event.
- * @param {any} props - Additional properties to send with the event.
- * @returns {Promise<Response>} The response from the Statsy API.
- * @throws {Error} Throws an error if it fails to send the request.
- */
-async function trackServerEvent({ request, name, props }: TrackEventOptions) {
-  if (!request) {
-    throw new Error(
-      "You must pass the request object to trackPageview when using server-side tracking."
-    );
-  }
-
-  const { hostname } = new URL(request.url);
-
-  if (!process.env.STATSY_API_KEY) {
-    throw new Error(
-      "You must set the STATSY_API_KEY environment variable to use the Statsy Edge application."
-    );
-  }
-
-  return await fetch(`https://api.statsy.com/v1/beep`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Forwarded-For": request.headers.get("x-forwarded-for") || "",
-      "User-Agent": request.headers.get("user-agent") || "",
-      Authorization: `Bearer ${process.env.STATSY_API_KEY}`,
-    },
-    body: JSON.stringify({
-      eventName: name,
-      href: request.url,
-      domain: hostname,
-      referrer: request.headers.get("referer") || "",
-      props,
-    }),
-  });
 }
 
 /**
@@ -223,13 +216,13 @@ function inject({
  *
  * @param {Request} [request] - The request object containing the url and headers. This parameter is optional and only used in a server context.
  */
-async function trackPageview(request?: Request) {
+function trackPageview({ request }: { request?: UrlWithHeaders } = {}) {
   if (isBrowser()) {
     if (window.statsy != null) {
       window.statsy.call(window, "pageview");
     }
-  } else {
-    return trackServerPageview(request);
+  } else if (request) {
+    return trackServerPageview({ request });
   }
 }
 
@@ -241,7 +234,7 @@ async function trackPageview(request?: Request) {
  * @param {Record<string, AllowedPropertyValues>} [params.props] - Additional properties to send with the event. This parameter is optional.
  * @param {Request} [params.request] - The request object containing the url and headers. This parameter is optional and only used in a server context.
  */
-async function trackEvent({ name, props, request }: TrackEventOptions) {
+function trackEvent({ name, props, request }: TrackEventOptions) {
   if (isBrowser()) {
     if (window.statsy != null) {
       window.statsy.call(window, name, props);

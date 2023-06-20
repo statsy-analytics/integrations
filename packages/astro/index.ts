@@ -1,9 +1,11 @@
+import { trackPageview, trackEvent } from "@statsy/analytics";
 import Statsy from "./src/Statsy.astro";
 
 export interface StatsyProps {
   siteId: string;
   trackingEndpointDomain: string;
   eventMiddleware?: (event: any) => any;
+  autoTrackPageviews?: boolean;
 }
 
 export interface StatsyEvent {
@@ -26,5 +28,6 @@ export interface StatsyEvent {
  * @param {string} props.siteId - Your Statsy site ID. This is a required parameter.
  * @param {string} [props.trackingEndpointDomain] - The domain to use for the analytics script. Defaults to `statsy.observer`.
  * @param {function} [props.eventMiddleware] - A middleware function to modify events before they are sent. Should return the event object or `null` to cancel the event.
+ * @param {boolean} [props.autoTrackPageviews] - Whether to automatically track page views. Defaults to `true`.
  */
-export { Statsy };
+export { Statsy, trackPageview, trackEvent };

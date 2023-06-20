@@ -11,6 +11,11 @@ const pluginOptionsSchema: GatsbyNode["pluginOptionsSchema"] = ({ Joi }) =>
         `Your optional self hosted Statsy domain. If you are using the self hosted version of Statsy, you can set this to your domain.`
       )
       .default("statsy.observer"),
+    autoTrackPageviews: Joi.boolean()
+      .description(
+        `Whether to automatically track page views. Defaults to true.`
+      )
+      .default(true),
     exclude: Joi.array()
       .items(Joi.string())
       .description(

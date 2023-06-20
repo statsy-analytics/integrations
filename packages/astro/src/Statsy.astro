@@ -1,6 +1,6 @@
 ---
 import { StatsyProps } from "../index";
-const { siteId, trackingEndpointDomain = 'statsy.observer', eventMiddleware } = Astro.props as StatsyProps;
+const { siteId, trackingEndpointDomain = 'statsy.observer', eventMiddleware, autoTrackPageviews } = Astro.props as StatsyProps;
 const scriptSrc = `https://${trackingEndpointDomain}/${siteId}.js`;
 
 let hasMiddleware = false;
@@ -14,6 +14,12 @@ const middleware = `
   window.statsy.call(window, "eventMiddleware", ${eventMiddleware?.toString()}) 
 `
 ---
+
+{typeof autoTrackPageviews === 'boolean' && 
+  <script set:html={`window.statsyConfig = {
+    autoTrackPageviews: ${autoTrackPageviews},
+  }`} />
+}
 
 <script src={scriptSrc} defer />
 {hasMiddleware && <script set:html={middleware} />
