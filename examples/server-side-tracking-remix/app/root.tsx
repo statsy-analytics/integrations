@@ -1,5 +1,5 @@
-import type { MetaFunction, LoaderArgs } from "@vercel/remix";
-import { json } from "@vercel/remix";
+import { Link } from "@remix-run/react";
+import type { MetaFunction } from "@vercel/remix";
 import {
   Links,
   LiveReload,
@@ -9,21 +9,11 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-// Import the function that will track the pageview
-import { trackPageview } from "@statsy/analytics";
-
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "New Remix App",
   viewport: "width=device-width,initial-scale=1",
 });
-
-export let loader = async ({ request }: LoaderArgs) => {
-  // Track the pageview
-  await trackPageview({ request });
-
-  return json({});
-};
 
 export default function App() {
   return (
@@ -33,7 +23,25 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Outlet />
+        <div>
+          <h1>Remix App</h1>
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/about">About</Link>
+            </li>
+            <li>
+              <Link to="/blog">Blog</Link>
+            </li>
+            <li>
+              <Link to="/contact">Contact</Link>
+            </li>
+          </ul>
+          <Outlet />
+        </div>
+
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
