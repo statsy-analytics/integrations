@@ -117,12 +117,11 @@ async function sendToStatsyApi({
   const statsyApiKey = getToken();
 
   // skip if it's not HTML
-  if (request.headers.get("content-type"))
-    if (!statsyApiKey) {
-      throw new Error(
-        "You must set the STATSY_API_KEY environment variable to use the Statsy Edge application."
-      );
-    }
+  if (!statsyApiKey) {
+    throw new Error(
+      "You must set the STATSY_API_KEY environment variable to use the Statsy Edge application."
+    );
+  }
 
   try {
     return await fetch(`https://api.statsy.com/v1/beep`, {
@@ -157,14 +156,23 @@ async function sendToStatsyApi({
 async function trackServerPageview({ request }: { request: UrlWithHeaders }) {
   const acceptHeader = request.headers.get("accept");
   const contentTypeHeader = request.headers.get("content-type");
+  const { pathname } = new URL(request.url);
 
+  // validate that it's HTML
   if (
     (acceptHeader && acceptHeader.includes("text/html")) ||
     (contentTypeHeader && contentTypeHeader.includes("text/html"))
   ) {
     await sendToStatsyApi({ request: request!, eventName: "pageview" });
   } else {
-    Promise.resolve();
+    // if there is no accept header or content type header, we assume it's HTML
+    const hasExtensionOtherThanHTML =
+      pathname.includes(".") && !pathname.endsWith(".html");
+    if (!hasExtensionOtherThanHTML) {
+      await sendToStatsyApi({ request: request!, eventName: "pageview" });
+    } else {
+      Promise.resolve();
+    }
   }
 }
 

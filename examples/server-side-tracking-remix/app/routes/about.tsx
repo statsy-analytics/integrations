@@ -1,4 +1,4 @@
-import type { MetaFunction, LoaderArgs } from "@vercel/remix";
+import type { LoaderArgs } from "@vercel/remix";
 import { json } from "@vercel/remix";
 import { trackPageview } from "@statsy/analytics";
 
@@ -6,8 +6,7 @@ export const config = { runtime: "edge" };
 
 export let loader = async ({ request }: LoaderArgs) => {
   // Track the pageview
-  // await trackPageview({ request });
-  console.log("url: ", request.url);
+  await trackPageview({ request });
 
   return json({});
 };
