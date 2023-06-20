@@ -12,17 +12,24 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      packages: write
+      actions: write
       pull-requests: write
+      statuses: write
+      contents: write
+      issues: write
+      security-events: write
+      pages: read
+
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          path: main
 
-      - name: Setup pnpm 7
+      - name: Setup pnpm 8
         uses: pnpm/action-setup@v2
         with:
-          version: 7
+          version: 8.6.0
 
       - name: Setup Node.js 16.x
         uses: actions/setup-node@v2
@@ -30,7 +37,7 @@ jobs:
           node-version: 16.x
 
       - name: Install Dependencies
-        run: pnpm i --no-frozen-lockfile
+        run: pnpm install
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
