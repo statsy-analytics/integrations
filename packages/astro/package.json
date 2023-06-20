@@ -1,6 +1,6 @@
 {
   "name": "@statsy/astro",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "author": "Thom Krupa <thom@statsy.com>",
   "keywords": [
@@ -37,7 +37,7 @@
     "typescript": "^5.0.4"
   },
   "peerDependencies": {
-    "astro": "^2.5.5"
+    "astro": "^0.0.2"
   },
   "publishConfig": {
     "access": "public"
