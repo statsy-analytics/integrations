@@ -1,4 +1,5 @@
 {
+  "name": "server-side-tracking-remix",
   "private": true,
   "sideEffects": false,
   "scripts": {
