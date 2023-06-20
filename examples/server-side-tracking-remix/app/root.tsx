@@ -20,7 +20,7 @@ export const meta: MetaFunction = () => ({
 
 export let loader = async ({ request }: LoaderArgs) => {
   // Track the pageview
-  trackPageview(request);
+  await trackPageview({ request });
 
   return json({});
 };
