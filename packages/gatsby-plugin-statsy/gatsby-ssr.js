@@ -24,6 +24,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 
 // src/gatsby-ssr.tsx
 var import_react = __toESM(require("react"));
+var import_gatsby = require("gatsby");
 var import_minimatch = require("minimatch");
 var onRenderBody = async ({ setHeadComponents, setPostBodyComponents }, pluginOptions) => {
   if (process.env.NODE_ENV !== `production` && process.env.NODE_ENV !== `test`)
@@ -74,20 +75,26 @@ var onRenderBody = async ({ setHeadComponents, setPostBodyComponents }, pluginOp
       window.statsy.call(window, "eventMiddleware", statsyEventMiddleware);
     })();
   `;
-  const code = `
-  window.statsy=function(...t){(window.statsyq=window.statsyq||[]).push(t)},window.statsy.call(window,"eventMiddleware",(function(t){const n=new
-    URL(t.href),e=[${excludeStatsyPaths.join(
-    ","
-  )}];if("pageview"===t.name)for(const t of e)if(t.test(n.pathname))return null;const o=["${removeQueryParams.join(
-    '","'
-  )}"];for(const t of o)n.searchParams.delete(t);return
-    t.href=n.toString(),console.log({event:t}),t}));
-  `;
+  if (typeof pluginOptions.autoTrackPageviews === `boolean`) {
+    setPostBodyComponents([
+      /* @__PURE__ */ import_react.default.createElement(
+        "script",
+        {
+          key: "statsy-config",
+          dangerouslySetInnerHTML: {
+            __html: `window.statsyConfig = {
+            autoTrackPageviews: ${pluginOptions.autoTrackPageviews},
+          }`
+          }
+        }
+      )
+    ]);
+  }
   setHeadComponents([
     /* @__PURE__ */ import_react.default.createElement("link", { rel: "preconnect", key: "preconnect-statsy", href: origin }),
     /* @__PURE__ */ import_react.default.createElement("link", { rel: "dns-prefetch", key: "dns-prefetch-statsy", href: origin }),
     /* @__PURE__ */ import_react.default.createElement(
-      "script",
+      import_gatsby.Script,
       {
         key: "script-statsy",
         src: `${origin}/${pluginOptions.siteId}.js`,
@@ -98,7 +105,7 @@ var onRenderBody = async ({ setHeadComponents, setPostBodyComponents }, pluginOp
   if (pluginOptions.exclude || pluginOptions.removeQueryParams) {
     setHeadComponents([
       /* @__PURE__ */ import_react.default.createElement(
-        "script",
+        import_gatsby.Script,
         {
           key: "gatsby-plugin-statsy-middleware",
           dangerouslySetInnerHTML: {

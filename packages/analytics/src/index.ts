@@ -64,6 +64,33 @@ interface FetchEventOptions {
   name?: string;
   props?: Record<string, AllowedPropertyValues>;
 }
+
+function getToken() {
+  let statsyApiKey;
+
+  if (typeof process !== "undefined" && process.env) {
+    // This is a Node.js environment
+    statsyApiKey = process.env.STATSY_API_KEY;
+    // @ts-ignore
+  } else if (typeof Deno !== "undefined") {
+    // This is a Deno environment
+    // @ts-ignore
+    statsyApiKey = Deno.env.get("STATSY_API_KEY");
+  } else {
+    throw new Error(
+      "Unknown environment. This code runs in either Node.js or Deno environments."
+    );
+  }
+
+  if (!statsyApiKey) {
+    throw new Error(
+      "You must set the STATSY_API_KEY environment variable to use the Statsy Edge application."
+    );
+  }
+
+  return statsyApiKey;
+}
+
 /**
  * A helper function to send a request to Statsy API.
  *
@@ -87,13 +114,15 @@ async function sendToStatsyApi({
   }
 
   const { hostname } = new URL(request.url);
-  const statsyApiKey = process.env.STATSY_API_KEY;
+  const statsyApiKey = getToken();
 
-  if (!statsyApiKey) {
-    throw new Error(
-      "You must set the STATSY_API_KEY environment variable to use the Statsy Edge application."
-    );
-  }
+  // skip if it's not HTML
+  if (request.headers.get("content-type"))
+    if (!statsyApiKey) {
+      throw new Error(
+        "You must set the STATSY_API_KEY environment variable to use the Statsy Edge application."
+      );
+    }
 
   try {
     return await fetch(`https://api.statsy.com/v1/beep`, {
@@ -109,7 +138,6 @@ async function sendToStatsyApi({
         href: request.url,
         domain: hostname,
         referrer: request.headers.get("referer") || "",
-        name,
         props,
       }),
     });
@@ -127,7 +155,17 @@ async function sendToStatsyApi({
  * @param {UrlWithHeaders} request - The request object containing the url and headers.
  */
 async function trackServerPageview({ request }: { request: UrlWithHeaders }) {
-  await sendToStatsyApi({ request: request!, eventName: "pageview" });
+  const acceptHeader = request.headers.get("accept");
+  const contentTypeHeader = request.headers.get("content-type");
+
+  if (
+    (acceptHeader && acceptHeader.includes("text/html")) ||
+    (contentTypeHeader && contentTypeHeader.includes("text/html"))
+  ) {
+    await sendToStatsyApi({ request: request!, eventName: "pageview" });
+  } else {
+    Promise.resolve();
+  }
 }
 
 /**
