@@ -167,6 +167,9 @@ importers:
 
   examples/server-side-tracking-next:
     dependencies:
+      '@statsy/analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@types/node':
         specifier: 20.3.1
         version: 20.3.1
