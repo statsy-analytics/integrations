@@ -3,12 +3,35 @@ import type { GatsbySSR } from "gatsby";
 import { Minimatch } from "minimatch";
 import type { MMRegExp } from "minimatch";
 
+function isProduction() {
+  if (process.env.NODE_ENV === `production`) {
+    return true;
+  }
+}
+
+function isTest() {
+  if (process.env.NODE_ENV === `test`) {
+    return true;
+  }
+}
+
 const onRenderBody: GatsbySSR["onRenderBody"] = async (
   { setHeadComponents, setPostBodyComponents },
   pluginOptions
 ) => {
-  if (process.env.NODE_ENV !== `production` && process.env.NODE_ENV !== `test`)
-    return null;
+  let { mode } = pluginOptions;
+
+  if (!mode || mode === "auto") {
+    if (isProduction()) {
+      mode = `production`;
+    } else if (isTest()) {
+      mode = `development`;
+    } else {
+      mode = `development`;
+    }
+  }
+
+  if (mode === `development`) return null;
 
   const origin = `https://${
     pluginOptions.trackingEndpointDomain || `statsy.observer`

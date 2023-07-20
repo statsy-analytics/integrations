@@ -6,6 +6,12 @@ import type { GatsbyNode } from "gatsby";
 const pluginOptionsSchema: GatsbyNode["pluginOptionsSchema"] = ({ Joi }) =>
   Joi.object({
     siteId: Joi.string().description(`Your Statsy site ID`).required(),
+    mode: Joi.string()
+      .description(
+        "The mode of tracking script. `production` or `development`. Defaults to `auto`."
+      )
+      .default("auto")
+      .valid("production", "development", "auto"),
     trackingEndpointDomain: Joi.string()
       .description(
         `Your optional self hosted Statsy domain. If you are using the self hosted version of Statsy, you can set this to your domain.`
